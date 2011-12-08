@@ -46,8 +46,8 @@ static int write_latency = 0;
 module_param(write_latency, int,0);
 
 /*
-  *  Error limit for latencies. This paramter 
-  *  is always in percentage and is configurable 
+  *  Error limit for latencies. This paramter
+  *  is always in percentage and is configurable
   * when the module is being loaded.
   */
 static int error_limit = 10;
@@ -70,7 +70,7 @@ static struct vbd_device {
   u32 r_upper_limit;
   u32 w_lower_limit;
   u32 w_upper_limit;
-  unsigned long  r_confd_freq;
+  unsigned long r_confd_freq;
   unsigned long r_error_freq;
   unsigned long w_confd_freq;
   unsigned long w_error_freq;
@@ -79,7 +79,7 @@ static struct vbd_device {
 static void count_latencies(int latency, int write) {
 
   if(write) {
-	
+
 	if(latency > device.w_lower_limit && latency < device.w_upper_limit)
 	  device.w_confd_freq++;
 	else
@@ -92,7 +92,7 @@ static void count_latencies(int latency, int write) {
 	  device.r_error_freq++;
   }
 }
-  
+
 
 
 /*
@@ -177,29 +177,30 @@ static struct block_device_operations vbd_ops = {
 		.getgeo = vbd_getgeo
 };
 
-static int proc_read_vbd_stats(char *page, char **start, 
+static int proc_read_vbd_stats(char *page, char **start,
 							   off_t off, int count, int *eof, void *data)
 {
 
   int len = 0;
   len = sprintf(page, "r_confd_freq=%ld\n"
-             "r_error_freq=%ld\n"
-              "w_confd_freq=%ld\n"
-              "w_error_freq=%ld\n",device.r_confd_freq,
+			 "r_error_freq=%ld\n"
+			  "w_confd_freq=%ld\n"
+			  "w_error_freq=%ld\n",device.r_confd_freq,
 				device.r_error_freq,device.w_confd_freq,
 				device.w_error_freq);
 
   return len;
-  
+
 }
 static int __init vbd_init(void) {
-  
+
   int read_confd_limit = (read_latency * error_limit) / 100;
   int write_confd_limit = (write_latency * error_limit) / 100;
+
   /*
    *  Assign the delay parameters to the device.
    *  The confd_limit parameters give s the values
-   * to subtract and add from to get the lower and 
+   * to subtract and add from to get the lower and
    * and the higher value of the confidence limit.
    */
   device.r_lower_limit = read_latency - read_confd_limit;
@@ -211,18 +212,18 @@ static int __init vbd_init(void) {
   device.w_confd_freq = 0;
   device.w_confd_freq = 0;
 
-  
+
   /*
-    * Allocate some memory for the device
-    */
+	* Allocate some memory for the device
+	*/
   device.size = nsectors * logical_block_size;
   spin_lock_init(&device.lock);
   device.data = vmalloc(device.size);
 
   /*
-    * if the kernel can't allocate space to this device
-    * then exit with -ENOMEM
-    */
+	* if the kernel can't allocate space to this device
+	* then exit with -ENOMEM
+	*/
   if(device.data == NULL)
 	return -ENOMEM;
 
@@ -232,9 +233,9 @@ static int __init vbd_init(void) {
   device.procfs_file = create_proc_read_entry(PROCFS_NAME, 0444, NULL,
 											  proc_read_vbd_stats, NULL);
 
-  if(device.procfs_file == NULL) 
+  if(device.procfs_file == NULL)
 	return -ENOMEM;
-  
+
   vbd_queue = blk_init_queue(vbd_request, &device.lock);
 
   /* if queue is not allocated then release the device */
