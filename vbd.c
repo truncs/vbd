@@ -106,6 +106,10 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
   unsigned long nbytes = nsect * logical_block_size;
   struct timeval start_time;
   struct timeval end_time;
+  struct timeval final_time;
+  int operation_delay, actual_delay;
+  long read_latency_usec;
+  long write_latency_usec;
 
   if ((offset + nbytes) > dev->size) {
 	printk (KERN_NOTICE "vbd: Beyond-end write (%ld %ld)\n", offset, nbytes);
@@ -114,19 +118,31 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 
   if (write) {
 	do_gettimeofday(&start_time);
-	mdelay(write_latency);
 	memcpy(dev->data + offset, buffer, nbytes);
 	do_gettimeofday(&end_time);
-	printk (KERN_NOTICE "vbd: write latency %ld\n",
-			end_time.tv_usec - start_time.tv_usec);
+	operation_delay = end_time.tv_usec - start_time.tv_usec;
+	write_latency_usec = write_latency*1000;
+	actual_delay = (write_latency_usec - operation_delay);
+	udelay(actual_delay);
+	do_gettimeofday(&final_time);
+	printk (KERN_NOTICE "vbd:  latency %d\n", 
+			operation_delay);
+	printk (KERN_NOTICE "vbd: write latency %ld\n", 
+			final_time.tv_usec - start_time.tv_usec);
   }
   else {
 	do_gettimeofday(&start_time);
-	mdelay(read_latency);
 	memcpy(buffer, dev->data + offset, nbytes);
 	do_gettimeofday(&end_time);
-	printk (KERN_NOTICE "vbd: write latency %ld\n",
-			end_time.tv_usec - start_time.tv_usec);
+	operation_delay = end_time.tv_usec - start_time.tv_usec;
+	read_latency_usec = read_latency*1000;
+	actual_delay = (read_latency_usec - operation_delay);
+	udelay(actual_delay);
+	do_gettimeofday(&final_time);
+	printk (KERN_NOTICE "vbd: latency %d\n", 
+			operation_delay);
+	printk (KERN_NOTICE "vbd: read latency %ld\n", 
+			final_time.tv_usec - start_time.tv_usec);
   }
 }
 
