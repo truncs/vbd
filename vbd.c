@@ -39,10 +39,10 @@ static int write_latency = 0;
 module_param(write_latency, int,0);
 
 /*
-  *  Error limit for latencies. This paramter 
-  *  is always in percentage and is configurable 
-  * when the module is being loaded.
-  */
+ *  Error limit for latencies. This paramter 
+ *  is always in percentage and is configurable 
+ * when the module is being loaded.
+ */
 static int error_limit = 10;
 module_param(error_limit, int, 0);
 
