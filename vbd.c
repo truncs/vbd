@@ -100,7 +100,7 @@ static void count_latencies(int latency, int write) {
  * of the data.
  */
 static void vbd_tx(struct vbd_device * dev, sector_t sector,
-			unsigned long nsect, char * buffer, int write) {
+				   unsigned long nsect, char * buffer, int write) {
 
   unsigned long offset = sector * logical_block_size;
   unsigned long nbytes = nsect * logical_block_size;
@@ -183,9 +183,9 @@ static int proc_read_vbd_stats(char *page, char **start,
 
   int len = 0;
   len = sprintf(page, "r_confd_freq=%ld\n"
-			 "r_error_freq=%ld\n"
-			  "w_confd_freq=%ld\n"
-			  "w_error_freq=%ld\n",device.r_confd_freq,
+				"r_error_freq=%ld\n"
+				"w_confd_freq=%ld\n"
+				"w_error_freq=%ld\n",device.r_confd_freq,
 				device.r_error_freq,device.w_confd_freq,
 				device.w_error_freq);
 
@@ -230,7 +230,7 @@ static int __init vbd_init(void) {
   /*
    * Initialize procfs entry for vbd
    */
-  device.procfs_file = create_proc_read_entry(PROCFS_NAME, 0444, NULL,
+  device.procfs_file = create_proc_read_entry(PROCFS_NAME, 0444, 
 											  proc_read_vbd_stats, NULL);
 
   if(device.procfs_file == NULL)
