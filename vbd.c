@@ -23,8 +23,8 @@ static int logical_block_size = 512;
 module_param(logical_block_size, int, 0);
 
 /*
-  * The number of sectors in the disk
-  */
+ * The number of sectors in the disk
+ */
 static int nsectors = 1024;
 module_param(nsectors, int, 0);
 
