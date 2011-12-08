@@ -5,14 +5,21 @@
 #include <linux/kernel.h>
 #include <linux/fs.h>
 #include <linux/errno.h>
+#include <linux/proc_fs.h>
 #include <linux/types.h>
 #include <linux/vmalloc.h>
 #include <linux/genhd.h>
 #include <linux/blkdev.h>
 #include <linux/hdreg.h>
 #include <linux/time.h>
+#include <linux/sched.h>
+#include <asm/uaccess.h>
+
 
 MODULE_LICENSE("Dual BSD/GPL");
+
+#define PROCFS_MAX_SIZE 1024
+#define PROCFS_NAME  "vbd"
 
 
 static int major_num = 0;
@@ -23,8 +30,8 @@ static int logical_block_size = 512;
 module_param(logical_block_size, int, 0);
 
 /*
- * The number of sectors in the disk
- */
+  * The number of sectors in the disk
+  */
 static int nsectors = 1024;
 module_param(nsectors, int, 0);
 
@@ -39,10 +46,10 @@ static int write_latency = 0;
 module_param(write_latency, int,0);
 
 /*
- *  Error limit for latencies. This paramter 
- *  is always in percentage and is configurable 
- * when the module is being loaded.
- */
+  *  Error limit for latencies. This paramter 
+  *  is always in percentage and is configurable 
+  * when the module is being loaded.
+  */
 static int error_limit = 10;
 module_param(error_limit, int, 0);
 
@@ -57,15 +64,35 @@ static struct vbd_device {
   spinlock_t lock;
   u8 * data;
   struct gendisk *gd;
-  u32 read_latency;
-  u32 write_latency;
-  u32 read_confd_limit;
-  u32 write_confd_limit;
-  u64 read_confd_freq;
-  u64 read_error_freq;
-  u64 write_confd_freq;
-  u64 write_error_freq;
+  struct proc_dir_entry *procfs_file;
+  u8 *procfs_data;
+  u32 r_lower_limit;
+  u32 r_upper_limit;
+  u32 w_lower_limit;
+  u32 w_upper_limit;
+  unsigned long  r_confd_freq;
+  unsigned long r_error_freq;
+  unsigned long w_confd_freq;
+  unsigned long w_error_freq;
 } device;
+
+static void count_latencies(int latency, int write) {
+
+  if(write) {
+	
+	if(latency > device.w_lower_limit && latency < device.w_upper_limit)
+	  device.w_confd_freq++;
+	else
+	  device.w_error_freq++;
+  }
+  else {
+	if(latency > device.r_lower_limit && latency < device.r_upper_limit)
+	  device.r_confd_freq++;
+	else
+	  device.r_error_freq++;
+  }
+}
+  
 
 
 /*
@@ -150,23 +177,39 @@ static struct block_device_operations vbd_ops = {
 		.getgeo = vbd_getgeo
 };
 
+static int proc_read_vbd_stats(char *page, char **start, 
+							   off_t off, int count, int *eof, void *data)
+{
 
+  int len = 0;
+  len = sprintf(page, "r_confd_freq=%ld\n"
+             "r_error_freq=%ld\n"
+              "w_confd_freq=%ld\n"
+              "w_error_freq=%ld\n",device.r_confd_freq,
+				device.r_error_freq,device.w_confd_freq,
+				device.w_error_freq);
+
+  return len;
+  
+}
 static int __init vbd_init(void) {
   
+  int read_confd_limit = (read_latency * error_limit) / 100;
+  int write_confd_limit = (write_latency * error_limit) / 100;
   /*
    *  Assign the delay parameters to the device.
    *  The confd_limit parameters give s the values
    * to subtract and add from to get the lower and 
    * and the higher value of the confidence limit.
    */
-  device.read_latency = read_latency;
-  device.write_latency = write_latency;
-  device.read_confd_limit = (read_latency * error_limit) / 100;
-  device.write_confd_limit = (write_latency * error_limit) / 100;
-  device.read_confd_freq = 0;
-  device.read_error_freq = 0;
-  device.write_confd_freq = 0;
-  device.write_error_freq = 0;
+  device.r_lower_limit = read_latency - read_confd_limit;
+  device.r_upper_limit = read_latency + read_confd_limit;
+  device.w_lower_limit = write_latency - write_confd_limit;
+  device.w_upper_limit = write_latency + write_confd_limit;
+  device.r_confd_freq = 0;
+  device.r_error_freq = 0;
+  device.w_confd_freq = 0;
+  device.w_confd_freq = 0;
 
   
   /*
@@ -183,6 +226,15 @@ static int __init vbd_init(void) {
   if(device.data == NULL)
 	return -ENOMEM;
 
+  /*
+   * Initialize procfs entry for vbd
+   */
+  device.procfs_file = create_proc_read_entry(PROCFS_NAME, 0444, NULL,
+											  proc_read_vbd_stats, NULL);
+
+  if(device.procfs_file == NULL) 
+	return -ENOMEM;
+  
   vbd_queue = blk_init_queue(vbd_request, &device.lock);
 
   /* if queue is not allocated then release the device */
