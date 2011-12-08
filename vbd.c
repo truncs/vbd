@@ -30,26 +30,26 @@ static int logical_block_size = 512;
 module_param(logical_block_size, int, 0);
 
 /*
-  * The number of sectors in the disk
-  */
+ * The number of sectors in the disk
+ */
 static int nsectors = 1024;
 module_param(nsectors, int, 0);
 
 /*
-  * The required read  and write latency that has to be simulated .
-  * This paramters are configurable and can be passed while
-  * loading the module
-  */
+ * The required read  and write latency that has to be simulated .
+ * This paramters are configurable and can be passed while
+ * loading the module
+ */
 static int read_latency = 0;
 module_param(read_latency, int, 0);
 static int write_latency = 0;
 module_param(write_latency, int,0);
 
 /*
-  *  Error limit for latencies. This paramter
-  *  is always in percentage and is configurable
-  * when the module is being loaded.
-  */
+ *  Error limit for latencies. This paramter
+ *  is always in percentage and is configurable
+ * when the module is being loaded.
+ */
 static int error_limit = 10;
 module_param(error_limit, int, 0);
 
@@ -96,11 +96,11 @@ static void count_latencies(int latency, int write) {
 
 
 /*
-  * This is the fucntion that handles all the transferring
-  * of the data.
-  */
+ * This is the fucntion that handles all the transferring
+ * of the data.
+ */
 static void vbd_tx(struct vbd_device * dev, sector_t sector,
-				   unsigned long nsect, char * buffer, int write) {
+			unsigned long nsect, char * buffer, int write) {
 
   unsigned long offset = sector * logical_block_size;
   unsigned long nbytes = nsect * logical_block_size;
@@ -131,10 +131,10 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 }
 
 /*
-  * Service each request in the queue. If the request
-  * is not a REQ_TYPE_FS type then just skip the request
-  * notifying that it is skipping this request.
-  */
+ * Service each request in the queue. If the request
+ * is not a REQ_TYPE_FS type then just skip the request
+ * notifying that it is skipping this request.
+ */
 static void vbd_request(struct request_queue * q) {
   struct request *req;
   req = blk_fetch_request(q);
@@ -156,10 +156,10 @@ static void vbd_request(struct request_queue * q) {
 }
 
 /*
-  * The HDIO_GETGEO ioctl is handled in blkdev_ioctl(), which
-  * calls this. We need to implement getgeo, since we can't
-  * use tools such as fdisk to partition the drive otherwise.
-  */
+ * The HDIO_GETGEO ioctl is handled in blkdev_ioctl(), which
+ * calls this. We need to implement getgeo, since we can't
+ * use tools such as fdisk to partition the drive otherwise.
+ */
 int vbd_getgeo(struct block_device * block_device, struct hd_geometry * geo) {
 	long size;
 
@@ -214,16 +214,16 @@ static int __init vbd_init(void) {
 
 
   /*
-	* Allocate some memory for the device
-	*/
+   * Allocate some memory for the device
+   */
   device.size = nsectors * logical_block_size;
   spin_lock_init(&device.lock);
   device.data = vmalloc(device.size);
 
   /*
-	* if the kernel can't allocate space to this device
-	* then exit with -ENOMEM
-	*/
+   * if the kernel can't allocate space to this device
+   * then exit with -ENOMEM
+   */
   if(device.data == NULL)
 	return -ENOMEM;
 
@@ -243,9 +243,9 @@ static int __init vbd_init(void) {
 	goto out;
 
 /*
-  *  Let the kernel know the queue for this device and logical block size
-  *  that it operate on
-  */
+ *  Let the kernel know the queue for this device and logical block size
+ *  that it operate on
+ */
   blk_queue_logical_block_size(vbd_queue, logical_block_size);
 
   /* Register the device */
