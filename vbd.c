@@ -125,6 +125,7 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 	actual_delay = (write_latency_usec - operation_delay);
 	udelay(actual_delay);
 	do_gettimeofday(&final_time);
+	count_latencies(final_time.tv_usec - start_time.tv_usec,1);
 	printk (KERN_NOTICE "vbd:  latency %d\n", 
 			operation_delay);
 	printk (KERN_NOTICE "vbd: write latency %ld\n", 
@@ -139,6 +140,7 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 	actual_delay = (read_latency_usec - operation_delay);
 	udelay(actual_delay);
 	do_gettimeofday(&final_time);
+	count_latencies(final_time.tv_usec - start_time.tv_usec,0);
 	printk (KERN_NOTICE "vbd: latency %d\n", 
 			operation_delay);
 	printk (KERN_NOTICE "vbd: read latency %ld\n", 
@@ -209,9 +211,10 @@ static int proc_read_vbd_stats(char *page, char **start,
 
 }
 static int __init vbd_init(void) {
-
-  int read_confd_limit = (read_latency * error_limit) / 100;
-  int write_confd_limit = (write_latency * error_limit) / 100;
+  int read_latency_usec = read_latency * 1000;
+  int write_latency_usec = write_latency * 1000;
+  int read_confd_limit = (read_latency_usec * error_limit) / 100;
+  int write_confd_limit = (write_latency_usec * error_limit) / 100;
 
   /*
    *  Assign the delay parameters to the device.
@@ -219,10 +222,10 @@ static int __init vbd_init(void) {
    * to subtract and add from to get the lower and
    * and the higher value of the confidence limit.
    */
-  device.r_lower_limit = read_latency - read_confd_limit;
-  device.r_upper_limit = read_latency + read_confd_limit;
-  device.w_lower_limit = write_latency - write_confd_limit;
-  device.w_upper_limit = write_latency + write_confd_limit;
+  device.r_lower_limit = read_latency_usec - read_confd_limit;
+  device.r_upper_limit = read_latency_usec + read_confd_limit;
+  device.w_lower_limit = write_latency_usec - write_confd_limit;
+  device.w_upper_limit = write_latency_usec + write_confd_limit;
   device.r_confd_freq = 0;
   device.r_error_freq = 0;
   device.w_confd_freq = 0;
@@ -246,7 +249,7 @@ static int __init vbd_init(void) {
   /*
    * Initialize procfs entry for vbd
    */
-  device.procfs_file = create_proc_read_entry(PROCFS_NAME, 0444, 
+  device.procfs_file = create_proc_read_entry(PROCFS_NAME, 0444, NULL,
 											  proc_read_vbd_stats, NULL);
 
   if(device.procfs_file == NULL)
