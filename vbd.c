@@ -18,8 +18,7 @@
 
 MODULE_LICENSE("Dual BSD/GPL");
 
-#define PROCFS_MAX_SIZE 1024
-#define PROCFS_NAME  "vbd"
+#define MODULE_NAME "vbd"
 
 
 static int major_num = 0;
@@ -249,7 +248,7 @@ static int __init vbd_init(void) {
   /*
    * Initialize procfs entry for vbd
    */
-  device.procfs_file = create_proc_read_entry(PROCFS_NAME, 0444, NULL,
+  device.procfs_file = create_proc_read_entry(MODULE_NAME, 0444, NULL,
 											  proc_read_vbd_stats, NULL);
 
   if(device.procfs_file == NULL)
@@ -268,7 +267,7 @@ static int __init vbd_init(void) {
   blk_queue_logical_block_size(vbd_queue, logical_block_size);
 
   /* Register the device */
-  major_num = register_blkdev(major_num, "vbd");
+  major_num = register_blkdev(major_num, MODULE_NAME);
 
   /* if the device is unable to get a major number then release the device */
   if(major_num < 0) {
@@ -285,7 +284,7 @@ static int __init vbd_init(void) {
   device.gd->first_minor = 0;
   device.gd->fops = &vbd_ops;
   device.gd->private_data = &device;
-  strcpy(device.gd->disk_name, "vbd");
+  strcpy(device.gd->disk_name, MODULE_NAME);
   set_capacity(device.gd, nsectors);
   device.gd->queue = vbd_queue;
   add_disk(device.gd);
@@ -293,7 +292,7 @@ static int __init vbd_init(void) {
   return 0;
 
  out_unregister:
-  unregister_blkdev(major_num, "vbd");
+  unregister_blkdev(major_num, MODULE_NAME);
  out:
   vfree(device.data);
   return -ENOMEM;
@@ -305,9 +304,10 @@ static int __init vbd_init(void) {
  */
 static void __exit vbd_exit(void) {
 
+  remove_proc_entry(MODULE_NAME, NULL);
   del_gendisk(device.gd);
   put_disk(device.gd);
-  unregister_blkdev(major_num, "vbd");
+  unregister_blkdev(major_num, MODULE_NAME);
   blk_cleanup_queue(vbd_queue);
   vfree(device.data);
 }
