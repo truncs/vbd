@@ -64,7 +64,6 @@ static struct vbd_device {
   u8 * data;
   struct gendisk *gd;
   struct proc_dir_entry *procfs_file;
-  u8 *procfs_data;
   u32 r_lower_limit;
   u32 r_upper_limit;
   u32 w_lower_limit;
@@ -138,10 +137,6 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 	udelay(actual_delay);
 	do_gettimeofday(&final_time);
 	count_latencies(final_time.tv_usec - start_time.tv_usec,1);
-	printk (KERN_NOTICE "vbd:  latency %d\n", 
-			operation_delay);
-	printk (KERN_NOTICE "vbd: write latency %ld\n", 
-			final_time.tv_usec - start_time.tv_usec);
   }
   else {
 	do_gettimeofday(&start_time);
@@ -158,10 +153,6 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 	udelay(actual_delay);
 	do_gettimeofday(&final_time);
 	count_latencies(final_time.tv_usec - start_time.tv_usec,0);
-	printk (KERN_NOTICE "vbd: latency %d\n", 
-			operation_delay);
-	printk (KERN_NOTICE "vbd: read latency %ld\n", 
-			final_time.tv_usec - start_time.tv_usec);
   }
 }
 
