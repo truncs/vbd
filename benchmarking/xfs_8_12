@@ -1,0 +1,33 @@
+	Iozone: Performance Test of File I/O
+	        Version $Revision: 3.373 $
+		Compiled for 32 bit mode.
+		Build: linux 
+
+	Contributors:William Norcott, Don Capps, Isom Crawford, Kirby Collins
+	             Al Slater, Scott Rhine, Mike Wisner, Ken Goss
+	             Steve Landherr, Brad Smith, Mark Kelly, Dr. Alain CYR,
+	             Randy Dunlap, Mark Montague, Dan Million, Gavin Brebner,
+	             Jean-Marc Zucconi, Jeff Blomberg, Benny Halevy, Dave Boone,
+	             Erik Habbinga, Kris Strecker, Walter Wong, Joshua Root,
+	             Fabrice Bacchella, Zhenghua Xue, Qin Li, Darren Sawyer.
+
+	Run began: Sat Dec 10 02:32:42 2011
+
+	Auto Mode
+	File size set to 128 KB
+	Command line used: iozone -a -s 128 /mnt
+	Output is in Kbytes/sec
+	Time Resolution = 0.000001 seconds.
+	Processor cache size set to 1024 Kbytes.
+	Processor cache line size set to 32 bytes.
+	File stride size set to 17 * record size.
+                                                            random  random    bkwd   record   stride                                   
+              KB  reclen   write rewrite    read    reread    read   write    read  rewrite     read   fwrite frewrite   fread  freread
+             128       4   94738  109039   223751   167753  184730  129555  124399   106141   129299    60177    84605  218099   227769
+             128       8  104395  136163   249000   236122  247075  175075  214082   165396   252956   102726   175126  204135   226946
+             128      16  105348   80301   229013   247627  268880  178043  205459   199656   199370   180789   191067  203482   239294
+             128      32  103896  343203   156489   193935  246144  156269  222623   212969   223730   146965   221416  238808   214750
+             128      64  100083  141916   193674   244261  280140  181027  206465   196007   226106   137343   261702  225752   151490
+             128     128   79308  136750   254020   183877  174127  142532  167747   105169   117117    92690   103978  108109   121666
+
+iozone test complete.
