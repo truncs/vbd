@@ -49,7 +49,7 @@ module_param(write_latency, int,0);
  *  is always in percentage and is configurable
  * when the module is being loaded.
  */
-static int error_limit = 10;
+static int error_limit = 5;
 module_param(error_limit, int, 0);
 
 /* Kernel always talks in terms of 512  */
@@ -115,6 +115,14 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 		return;
   }
 
+  /*
+   *Here Latency is added just before read or write operations.
+   *At first we find out delay for memcopy operation and then 
+   *subtract that value from the input delay value to get the 
+   *actual input delay for read or write. After that udelay 
+   *is used to delay by that calculated time. If the calculated 
+   *time is negative then we skip delaying it.
+   */
   if (write) {
 	do_gettimeofday(&start_time);
 	memcpy(dev->data + offset, buffer, nbytes);
@@ -122,6 +130,11 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 	operation_delay = end_time.tv_usec - start_time.tv_usec;
 	write_latency_usec = write_latency*1000;
 	actual_delay = (write_latency_usec - operation_delay);
+	if ( actual_delay < 0) 
+	{
+		count_latencies(operation_delay, 1);
+		return;
+	}
 	udelay(actual_delay);
 	do_gettimeofday(&final_time);
 	count_latencies(final_time.tv_usec - start_time.tv_usec,1);
@@ -137,6 +150,11 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 	operation_delay = end_time.tv_usec - start_time.tv_usec;
 	read_latency_usec = read_latency*1000;
 	actual_delay = (read_latency_usec - operation_delay);
+	if ( actual_delay < 0) 
+	{
+		count_latencies(operation_delay, 0);
+		return;
+	}
 	udelay(actual_delay);
 	do_gettimeofday(&final_time);
 	count_latencies(final_time.tv_usec - start_time.tv_usec,0);
