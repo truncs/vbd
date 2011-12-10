@@ -235,8 +235,8 @@ static int __init vbd_init(void) {
   int write_confd_limit = (write_latency_usec * error_limit) / 100;
 
   /*
-   *  Assign the delay parameters to the device.
-   *  The confd_limit parameters give s the values
+   * Assign the delay parameters to the device.
+   * The confd_limit parameters gives the values
    * to subtract and add from to get the lower and
    * and the higher value of the confidence limit.
    */
@@ -280,8 +280,8 @@ static int __init vbd_init(void) {
 	goto out;
 
 /*
- *  Let the kernel know the queue for this device and logical block size
- *  that it operate on
+ * Let the kernel know the queue for this device and logical block size
+ * that it operate on
  */
   blk_queue_logical_block_size(vbd_queue, logical_block_size);
 
@@ -319,7 +319,7 @@ static int __init vbd_init(void) {
 }
 
 /*
- *  Cleanup and deregister the device on rmmod
+ * Cleanup and deregister the device on rmmod
  */
 static void __exit vbd_exit(void) {
 
