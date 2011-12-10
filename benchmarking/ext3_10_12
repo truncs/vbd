@@ -1,0 +1,35 @@
+	Iozone: Performance Test of File I/O
+	        Version $Revision: 3.373 $
+		Compiled for 32 bit mode.
+		Build: linux 
+
+	Contributors:William Norcott, Don Capps, Isom Crawford, Kirby Collins
+	             Al Slater, Scott Rhine, Mike Wisner, Ken Goss
+	             Steve Landherr, Brad Smith, Mark Kelly, Dr. Alain CYR,
+	             Randy Dunlap, Mark Montague, Dan Million, Gavin Brebner,
+	             Jean-Marc Zucconi, Jeff Blomberg, Benny Halevy, Dave Boone,
+	             Erik Habbinga, Kris Strecker, Walter Wong, Joshua Root,
+	             Fabrice Bacchella, Zhenghua Xue, Qin Li, Darren Sawyer.
+
+	Run began: Sat Dec 10 02:28:25 2011
+
+	Auto Mode
+	File size set to 128 KB
+	Command line used: iozone -a -s 128 /mnt
+	Output is in Kbytes/sec
+	Time Resolution = 0.000001 seconds.
+	Processor cache size set to 1024 Kbytes.
+	Processor cache line size set to 32 bytes.
+	File stride size set to 17 * record size.
+                                                            random  random    bkwd   record   stride                                   
+              KB  reclen   write rewrite    read    reread    read   write    read  rewrite     read   fwrite frewrite   fread  freread
+             128       4   52916128000000    42637    50694128000000   92348  118177   108294   121448   102818    86189  128654   125738
+             128       8   53487   72277   139130   135605  130360  107382  111695   106568   125865   100871    88826  105609   233961
+             128      16   55943   77766   146100   132105  119842  106749  232275   164527   179804   142061    86255  137500   144789
+             128      32   56534   71232   130219   137338  165573  121891  133342   122955   113670   103056   134892  142374    72484
+             128      64   47994   73992   117546   132381  129296  102075  113888   103223   122494    88100   174641  140025   119842
+             128     128   49534   72980   140491   141131  155717  110525  127487   111695   134312   100474    93435  122242   111210
+
+iozone test complete.
+Timer resolution is poor. Some small transfers may have 
+reported inaccurate results. Sizes 4 Kbytes and below.

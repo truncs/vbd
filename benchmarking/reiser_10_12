@@ -1,0 +1,33 @@
+	Iozone: Performance Test of File I/O
+	        Version $Revision: 3.373 $
+		Compiled for 32 bit mode.
+		Build: linux 
+
+	Contributors:William Norcott, Don Capps, Isom Crawford, Kirby Collins
+	             Al Slater, Scott Rhine, Mike Wisner, Ken Goss
+	             Steve Landherr, Brad Smith, Mark Kelly, Dr. Alain CYR,
+	             Randy Dunlap, Mark Montague, Dan Million, Gavin Brebner,
+	             Jean-Marc Zucconi, Jeff Blomberg, Benny Halevy, Dave Boone,
+	             Erik Habbinga, Kris Strecker, Walter Wong, Joshua Root,
+	             Fabrice Bacchella, Zhenghua Xue, Qin Li, Darren Sawyer.
+
+	Run began: Sat Dec 10 02:30:42 2011
+
+	Auto Mode
+	File size set to 128 KB
+	Command line used: iozone -a -s 128
+	Output is in Kbytes/sec
+	Time Resolution = 0.000001 seconds.
+	Processor cache size set to 1024 Kbytes.
+	Processor cache line size set to 32 bytes.
+	File stride size set to 17 * record size.
+                                                            random  random    bkwd   record   stride                                   
+              KB  reclen   write rewrite    read    reread    read   write    read  rewrite     read   fwrite frewrite   fread  freread
+             128       4   82848  121089   182079   168667  158605  163678  127234    75870    94891    66565    84661   80807    78532
+             128       8   99142  121322   231865   226936  250448  184734  157422    96825   121217   102728    89701  124017   117005
+             128      16   96673  115828   218404   192448  235719  154016  125727   138811   131700    74762    68194  114388   114600
+             128      32  100472  113275   131688   210851  155721  146436  112188   170204   170219   121200   186348  124379   207777
+             128      64  105616   87613   185806   180005  200017  135723  124872   110336   124380    78432   166862  127750   137783
+             128     128   85735  126372   174631   148472  243389  178004  185223    58797   114382    91953    58206  107111   117318
+
+iozone test complete.
