@@ -35,8 +35,8 @@ static int nsectors = 1024;
 module_param(nsectors, int, 0);
 
 /*
- * The required read  and write latency that has to be simulated .
- * This paramters are configurable and can be passed while
+ * The required read  and write latency that has to be simulated.
+ * These paramters are configurable and can be passed while
  * loading the module
  */
 static int read_latency = 0;
@@ -45,8 +45,8 @@ static int write_latency = 0;
 module_param(write_latency, int,0);
 
 /*
- *  Error limit for latencies. This paramter
- *  is always in percentage and is configurable
+ * Error limit for latencies. This paramter
+ * is always in percentage and is configurable
  * when the module is being loaded.
  */
 static int error_limit = 5;
@@ -116,12 +116,12 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
   }
 
   /*
-   *Here Latency is added just before read or write operations.
-   *At first we find out delay for memcopy operation and then 
-   *subtract that value from the input delay value to get the 
-   *actual input delay for read or write. After that udelay 
-   *is used to delay by that calculated time. If the calculated 
-   *time is negative then we skip delaying it.
+   * Here latency is added just before read or write operations.
+   * At first we find out delay for memcpy operation and then 
+   * subtract that value from the delay that has to be simulated.
+   * After that udelay is used to delay by that calculated time.
+   * If the calculated delay is negative that means that we are 
+   * already overdue so we just skip udelay and return.
    */
   if (write) {
 	do_gettimeofday(&start_time);
@@ -213,7 +213,7 @@ static struct block_device_operations vbd_ops = {
 };
 
 static int proc_read_vbd_stats(char *page, char **start,
-							   off_t off, int count, int *eof, void *data)
+			off_t off, int count, int *eof, void *data)
 {
 
   int len = 0;
@@ -228,6 +228,7 @@ static int proc_read_vbd_stats(char *page, char **start,
 
 }
 static int __init vbd_init(void) {
+	
   int read_latency_usec = read_latency * 1000;
   int write_latency_usec = write_latency * 1000;
   int read_confd_limit = (read_latency_usec * error_limit) / 100;
@@ -267,7 +268,7 @@ static int __init vbd_init(void) {
    * Initialize procfs entry for vbd
    */
   device.procfs_file = create_proc_read_entry(MODULE_NAME, 0444, NULL,
-											  proc_read_vbd_stats, NULL);
+	proc_read_vbd_stats, NULL);
 
   if(device.procfs_file == NULL)
 	return -ENOMEM;
