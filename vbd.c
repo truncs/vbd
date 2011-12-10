@@ -152,7 +152,7 @@ static void vbd_tx(struct vbd_device * dev, sector_t sector,
 	actual_delay = (read_latency_usec - operation_delay);
 	if ( actual_delay < 0) 
 	{
-		count_latencies(operation_delay, 1);
+		count_latencies(operation_delay, 0);
 		return;
 	}
 	udelay(actual_delay);
