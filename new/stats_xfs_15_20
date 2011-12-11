@@ -1,0 +1,4 @@
+r_confd_freq=833
+r_error_freq=18
+w_confd_freq=1883
+w_error_freq=40
